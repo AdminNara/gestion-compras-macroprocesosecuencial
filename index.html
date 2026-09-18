@@ -45,7 +45,7 @@
 
       const diagram = document.querySelector("#macroproceso-secuencial");
       try {
-        const response = await fetch("macroproceso-secuencial.mmd?v=master-20260918");
+        const response = await fetch("macroproceso-secuencial.mmd?v=master-20260918-terminologia1");
         if (!response.ok) throw new Error("No se pudo cargar el diagrama maestro.");
         const source = await response.text();
         mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: "base", themeVariables: { fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", primaryColor: "#e0f2fe", primaryBorderColor: "#0284c7", lineColor: "#475569", textColor: "#0f172a" } });

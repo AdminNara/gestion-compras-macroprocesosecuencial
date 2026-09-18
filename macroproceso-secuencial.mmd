@@ -17,7 +17,7 @@ sequenceDiagram
         CO-->>CO: Pedir corrección o anexos al proveedor
         CO->>CO: Recibir versión corregida y revisar de nuevo
       else Datos conformes
-        CO->>IM: Entregar factura, OP, detalle y soportes
+        CO->>IM: Entregar Traducción de la Factura, OP, detalle y soportes
         IM->>IM: Revisar detalle recibido
         IM->>IM: Crear OI en JDE y devolver referencia
         IM-->>CO: OI disponible / referencia
