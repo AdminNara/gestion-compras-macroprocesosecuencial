@@ -3,98 +3,128 @@ sequenceDiagram
     participant CO as Compras
     participant IM as Importaciones
     participant CT as Costeo
-    participant RC as Recepción
-    participant PG as Pagos
-    participant CN as Contabilidad
+    participant CPD as CPD
+    participant AP as Asistente de pagos
+    participant CON as Contabilidad
 
-    Note over CO,CN: Diagrama de nivel macro: secuencia general y relaciones entre áreas.
+    Note over CO,CON: AS IS actual · importaciones y gastos logísticos asociados. Compras locales excluidas.
+    Note over CO,CON: Los detonantes son independientes: factura/OP, aviso de embarque, pago y corte de conciliación.
 
-    rect rgb(238, 246, 255)
-    Note over CO,IM: Inicio y referencia de compra
-    CO->>CO: Revisar datos y soportes
-    alt Datos incompletos
-        CO-->>CO: Solicitar corrección
-    else Datos conformes
-        CO->>IM: Entregar detalle validado
-        IM->>IM: Crear referencia en ERP
-        IM-->>CO: Comunicar referencia
-    end
-    end
-
-    rect rgb(245, 241, 255)
-    Note over IM,CT: Seguimiento y preparación para costeo
-    IM->>IM: Registrar seguimiento de embarques
-    IM->>IM: Coordinar logística y revisar datos
-    alt Hay diferencias
-        IM->>IM: Corregir y volver a revisar
-    else Información conforme
-        IM->>IM: Confirmar revisión
-    end
-    IM->>CT: Entregar expediente de trabajo
+    rect rgb(238,245,255)
+      Note over CO,IM: Detonante: factura / OP / proforma recibida
+      CO->>CO: Revisar proveedor, compañía, factura, OP, SKU, cantidades, moneda y anexos
+      alt Datos incompletos o inconsistentes
+        CO-->>CO: Pedir corrección o anexos al proveedor
+        CO->>CO: Recibir versión corregida y revisar de nuevo
+      else Datos conformes
+        CO->>IM: Entregar factura, OP, detalle y soportes
+        IM->>IM: Revisar detalle recibido
+        IM->>IM: Crear OI en JDE y devolver referencia
+        IM-->>CO: OI disponible / referencia
+      end
     end
 
-    rect rgb(240, 252, 246)
-    Note over CT,RC: Costeo y preparación de recepción
-    CT->>CT: Preparar distribución de costos
-    par Revisión de datos
-        CT->>CT: Comparar datos en ERP
-    and Revisión de soportes
-        CT->>CT: Revisar antecedentes disponibles
-    end
-    alt Control pendiente
-        CT->>IM: Solicitar corrección
-        IM-->>CT: Entregar actualización
-    else Conforme
-        CT->>RC: Confirmar costeo
-    end
-    end
-
-    rect rgb(255, 248, 235)
-    Note over RC,CN: Recepción e incidencias
-    RC->>RC: Comparar recepción y registros
-    alt Incidencia identificada
-        RC->>CT: Reportar incidencia
-        CT->>CT: Registrar caso en aplicación de incidencias
-        CT-->>IM: Informar seguimiento
-        CT-->>CO: Solicitar gestión cuando aplica
-        CT->>CN: Enviar caso para registro aplicable
-        CT->>RC: Comunicar resolución
-    else Sin diferencia
-        RC->>RC: Registrar recepción
-    end
+    rect rgb(241,250,241)
+      Note over IM,CPD: Detonante independiente: aviso de embarque
+      IM->>IM: Registrar ID y datos del embarque en Airtable
+      IM->>IM: Obtener OI validada de Compras / JDE
+      IM->>IM: Asignar agencia con ID, OI y soportes
+      IM->>IM: Coordinar transporte y recibir preliquidación
+      IM->>IM: Comparar preliquidación con OI, SAC y reglas
+      alt Hay diferencias
+        IM->>IM: Solicitar o aplicar correcciones
+        IM->>IM: Volver a comparar
+      else Conforme
+        IM->>IM: Confirmar revisión arancelaria
+      end
+      IM->>IM: Gestionar tributos y aviso de liberación
+      IM->>CO: Programar recepción con Compras / CPD
+      IM->>CT: Entregar carpeta y soportes para costeo
     end
 
-    rect rgb(255, 241, 244)
-    Note over CO,PG: Solicitud y gestión de pago
-    CO->>PG: Entregar solicitud y soportes
-    IM-->>PG: Entregar solicitud cuando aplica
-    PG->>PG: Preparar y revisar solicitud
-    alt Solicitud requiere corrección
-        PG->>PG: Revisar dentro de su circuito
-        opt Falta información de origen
-            PG->>CO: Consultar a Compras cuando aplica
-            PG->>IM: Consultar a Importaciones cuando aplica
+    rect rgb(255,248,235)
+      CT->>CT: Preparar Excel H1 / H2 y reparto
+      par Control JDE / espejo
+        CT->>CT: Aplicar regla espejo y costos en JDE
+        CT->>CT: Descargar costos y comparar con Excel
+      and Control documental
+        CT->>CT: Revisar PDF contra soportes
+      end
+      alt Algún control no está conforme
+        CT->>IM: Corregir datos con Costeo / Importaciones
+        IM-->>CT: Datos corregidos
+        CT->>CT: Repetir controles
+      else Ambos controles OK
+        CT->>IM: Mover ruta a etapa 4 en JDE
+        CT->>CPD: Actualizar fecha / factor y confirmar costeo
+      end
+      Note over CT,CPD: La tolerancia mencionada en la transcripción es contextual de 6 dólares. No se representa como límite universal.
+    end
+
+    rect rgb(248,240,255)
+      Note over CPD,CON: Detonante: carga y referencias disponibles
+      CPD->>CPD: Comparar físico con factura / JDE
+      alt Hay faltante, sobrante, avería o intercambio
+        CPD->>CT: Reportar incidencia y soportes
+        CT->>CT: Registrar y contrastar caso en SFA
+        CT-->>IM: Informar incidencia y validación
+        CT-->>CO: Informar incidencia y requerir gestión si aplica
+        alt Requiere reclamo o corrección de Compras
+          CO->>CO: Gestionar con proveedor / documentos
+          CO-->>CT: Comunicar respuesta o soporte
+        else Tratamiento de Costeo / SFA
+          CT->>CT: Gestionar tratamiento y evidencia aplicable
         end
-    else Solicitud conforme
-        PG->>CN: Entregar soporte para registro
-        CN->>CN: Registrar y relacionar seguimiento
-    end
+        CT->>CON: Enviar caso para movimiento, NC o gasto aplicable
+        CON-->>CT: Aprobación aplicable cuando corresponde
+        CT->>CPD: Comunicar resolución / instrucción
+        CPD->>CPD: Registrar recepción y cierre operativo del caso
+      else Recepción sin diferencia
+        CPD->>CPD: Registrar recepción sin diferencia
+      end
+      Note over CPD,CT: El ajuste de referencias se realiza antes de la llegada para permitir el cierre posterior de la OP en JDE.
     end
 
-    rect rgb(241, 245, 249)
-    Note over CN,CO: Revisión de expediente o corte
-    CN->>CN: Revisar partidas y soportes
-    alt Hay diferencias
-        CN->>IM: Solicitar aclaración
-        opt La causa está en Compras
-            IM->>CO: Solicitar aclaración
-            CO-->>IM: Entregar soporte
+    rect rgb(240,248,255)
+      Note over CO,CON: Detonante independiente: OP/proforma o factura para gestionar pago
+      CO->>AP: Entregar solicitud y soportes de Compras
+      IM-->>AP: Entregar solicitud y soportes de Importaciones cuando aplica
+      AP->>AP: Preparar solicitud en Getpay
+      AP->>AP: Consultar resultado de aprobación Getpay
+      alt Solicitud rechazada
+        AP->>AP: Revisar y corregir dentro de su circuito
+        opt Excepción: falta dato o soporte del solicitante
+          AP->>CO: Consultar a Compras cuando el origen lo requiere
+          AP->>IM: Consultar a Importaciones cuando el origen lo requiere
+          CO-->>AP: Entregar corrección de Compras, si corresponde
+          IM-->>AP: Entregar corrección de Importaciones, si corresponde
         end
-        IM-->>CN: Entregar aclaración
-    else Sin diferencias
-        CN->>CN: Documentar revisión
-    end
+        AP->>AP: Reprocesar la solicitud
+      else Estado aprobado
+        AP->>CON: Entregar soporte aprobado para registro
+        CON->>CON: Revisar soporte y registrar en JDE
+        CON->>CON: Relacionar lote, documento y pago
+        Note over CON: El estado aprobado de Getpay precede al registro contable.
+      end
     end
 
-    Note over CO,CN: Los hitos operativos, documentales y financieros pueden cerrarse en momentos distintos.
+    rect rgb(248,248,248)
+      Note over CON,IM: Detonante independiente: revisión de expediente o corte de proveedor internacional crédito/revolvente
+      CON->>CON: Reunir mayor, tránsito y estado del proveedor
+      CON->>CON: Integrar anticipos, facturas, pagos y NC
+      CON->>CON: Clasificar saldos y pendientes al corte
+      alt Hay diferencias
+        CON->>IM: Solicitar soportes y aclaración de importación
+        opt La causa depende de Compras
+          IM->>CO: Solicitar aclaración documental/comercial
+          CO-->>IM: Entregar soporte o aclaración
+        end
+        IM-->>CON: Entregar soportes / aclarar situación
+        CON->>CON: Integrar y revisar nuevamente
+      else Sin diferencias
+        CON->>CON: Documentar conciliación
+      end
+    end
+
+    Note over CO,CON: Cierres de recepción, costeo, pagos y conciliación se mantienen separados según la operación observada.
 
