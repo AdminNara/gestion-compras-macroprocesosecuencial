@@ -1,0 +1,146 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content="Demo conceptual anonimizada de un macroproceso secuencial." />
+    <title>Demo de macroproceso secuencial</title>
+    <style>
+      :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+      * { box-sizing: border-box; }
+      body { margin: 0; color: #1e293b; background: #f8fafc; }
+      main { width: min(100% - 2rem, 1120px); margin: 0 auto; padding: 2.5rem 0 3.5rem; }
+      .eyebrow { margin: 0 0 .75rem; color: #0369a1; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+      h1 { margin: 0; color: #0f172a; font-size: clamp(1.85rem, 5vw, 3rem); line-height: 1.1; }
+      .lead { max-width: 72ch; margin: 1rem 0 1.5rem; color: #475569; font-size: 1.05rem; line-height: 1.6; }
+      .notice { border-left: .3rem solid #0284c7; border-radius: .35rem; padding: 1rem 1.1rem; background: #e0f2fe; color: #0c4a6e; line-height: 1.55; }
+      .notice strong { color: #082f49; }
+      .diagram { margin-top: 1.5rem; overflow-x: auto; border: 1px solid #dbe3ec; border-radius: .75rem; padding: 1.25rem; background: #fff; box-shadow: 0 10px 30px rgb(15 23 42 / 7%); }
+      .diagram .mermaid { min-width: 1000px; }
+      .source { margin: 1.25rem 0 0; text-align: right; }
+      .source a { color: #0369a1; font-weight: 700; }
+      footer { margin-top: 2.25rem; color: #64748b; font-size: .9rem; line-height: 1.55; }
+      @media (max-width: 640px) { main { width: min(100% - 1.25rem, 1120px); padding-top: 1.5rem; } .diagram { padding: .75rem; } }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="eyebrow">Nara Consultores · Demo pública</p>
+      <h1>Macroproceso secuencial</h1>
+      <p class="lead">Una representación visual genérica de interacciones entre áreas de Compras, Importaciones, Costeo, Recepción, Pagos y Contabilidad.</p>
+      <div class="notice" role="note">
+        <strong>Alcance de la demo:</strong> este material es conceptual y anonimizado. No representa procedimientos, reglas, configuraciones, datos, documentos ni decisiones de un cliente.
+      </div>
+      <section class="diagram" aria-label="Diagrama de secuencia Mermaid">
+        <pre class="mermaid">
+sequenceDiagram
+    autonumber
+    participant CO as Compras
+    participant IM as Importaciones
+    participant CT as Costeo
+    participant RC as Recepción
+    participant PG as Pagos
+    participant CN as Contabilidad
+
+    Note over CO,CN: Demo conceptual anonimizada. No representa un procedimiento ni reglas vigentes.
+
+    rect rgb(238, 246, 255)
+    Note over CO,IM: Inicio y referencia de compra
+    CO->>CO: Revisar datos y soportes
+    alt Datos incompletos
+        CO-->>CO: Solicitar corrección
+    else Datos conformes
+        CO->>IM: Entregar detalle validado
+        IM->>IM: Crear referencia en ERP
+        IM-->>CO: Comunicar referencia
+    end
+    end
+
+    rect rgb(245, 241, 255)
+    Note over IM,CT: Seguimiento y preparación para costeo
+    IM->>IM: Registrar seguimiento de embarques
+    IM->>IM: Coordinar logística y revisar datos
+    alt Hay diferencias
+        IM->>IM: Corregir y volver a revisar
+    else Información conforme
+        IM->>IM: Confirmar revisión
+    end
+    IM->>CT: Entregar expediente de trabajo
+    end
+
+    rect rgb(240, 252, 246)
+    Note over CT,RC: Costeo y preparación de recepción
+    CT->>CT: Preparar distribución de costos
+    par Revisión de datos
+        CT->>CT: Comparar datos en ERP
+    and Revisión de soportes
+        CT->>CT: Revisar antecedentes disponibles
+    end
+    alt Control pendiente
+        CT->>IM: Solicitar corrección
+        IM-->>CT: Entregar actualización
+    else Conforme
+        CT->>RC: Confirmar costeo
+    end
+    end
+
+    rect rgb(255, 248, 235)
+    Note over RC,CN: Recepción e incidencias
+    RC->>RC: Comparar recepción y registros
+    alt Incidencia identificada
+        RC->>CT: Reportar incidencia
+        CT->>CT: Registrar caso en aplicación de incidencias
+        CT-->>IM: Informar seguimiento
+        CT-->>CO: Solicitar gestión cuando aplica
+        CT->>CN: Enviar caso para registro aplicable
+        CT->>RC: Comunicar resolución
+    else Sin diferencia
+        RC->>RC: Registrar recepción
+    end
+    end
+
+    rect rgb(255, 241, 244)
+    Note over CO,PG: Solicitud y gestión de pago
+    CO->>PG: Entregar solicitud y soportes
+    IM-->>PG: Entregar solicitud cuando aplica
+    PG->>PG: Preparar y revisar solicitud
+    alt Solicitud requiere corrección
+        PG->>PG: Revisar dentro de su circuito
+        opt Falta información de origen
+            PG->>CO: Consultar a Compras cuando aplica
+            PG->>IM: Consultar a Importaciones cuando aplica
+        end
+    else Solicitud conforme
+        PG->>CN: Entregar soporte para registro
+        CN->>CN: Registrar y relacionar seguimiento
+    end
+    end
+
+    rect rgb(241, 245, 249)
+    Note over CN,CO: Revisión de expediente o corte
+    CN->>CN: Revisar partidas y soportes
+    alt Hay diferencias
+        CN->>IM: Solicitar aclaración
+        opt La causa está en Compras
+            IM->>CO: Solicitar aclaración
+            CO-->>IM: Entregar soporte
+        end
+        IM-->>CN: Entregar aclaración
+    else Sin diferencias
+        CN->>CN: Documentar revisión
+    end
+    end
+
+    Note over CO,CN: Los hitos operativos, documentales y financieros pueden cerrarse en momentos distintos.
+        </pre>
+      </section>
+      <p class="source"><a href="macroproceso-secuencial.mmd">Ver fuente Mermaid anonimizada</a></p>
+      <footer>La disponibilidad pública de esta demo no valida ningún proceso operativo.</footer>
+    </main>
+    <script type="module">
+      import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
+      mermaid.initialize({ startOnLoad: true, securityLevel: "strict", theme: "base", themeVariables: { fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", primaryColor: "#e0f2fe", primaryBorderColor: "#0284c7", lineColor: "#475569", textColor: "#0f172a" } });
+    </script>
+  </body>
+</html>
+
