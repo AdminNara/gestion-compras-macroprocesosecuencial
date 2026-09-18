@@ -1,0 +1,100 @@
+sequenceDiagram
+    autonumber
+    participant CO as Compras
+    participant IM as Importaciones
+    participant CT as Costeo
+    participant RC as Recepción
+    participant PG as Pagos
+    participant CN as Contabilidad
+
+    Note over CO,CN: Demo conceptual anonimizada. No representa un procedimiento ni reglas vigentes.
+
+    rect rgb(238, 246, 255)
+    Note over CO,IM: Inicio y referencia de compra
+    CO->>CO: Revisar datos y soportes
+    alt Datos incompletos
+        CO-->>CO: Solicitar corrección
+    else Datos conformes
+        CO->>IM: Entregar detalle validado
+        IM->>IM: Crear referencia en ERP
+        IM-->>CO: Comunicar referencia
+    end
+    end
+
+    rect rgb(245, 241, 255)
+    Note over IM,CT: Seguimiento y preparación para costeo
+    IM->>IM: Registrar seguimiento de embarques
+    IM->>IM: Coordinar logística y revisar datos
+    alt Hay diferencias
+        IM->>IM: Corregir y volver a revisar
+    else Información conforme
+        IM->>IM: Confirmar revisión
+    end
+    IM->>CT: Entregar expediente de trabajo
+    end
+
+    rect rgb(240, 252, 246)
+    Note over CT,RC: Costeo y preparación de recepción
+    CT->>CT: Preparar distribución de costos
+    par Revisión de datos
+        CT->>CT: Comparar datos en ERP
+    and Revisión de soportes
+        CT->>CT: Revisar antecedentes disponibles
+    end
+    alt Control pendiente
+        CT->>IM: Solicitar corrección
+        IM-->>CT: Entregar actualización
+    else Conforme
+        CT->>RC: Confirmar costeo
+    end
+    end
+
+    rect rgb(255, 248, 235)
+    Note over RC,CN: Recepción e incidencias
+    RC->>RC: Comparar recepción y registros
+    alt Incidencia identificada
+        RC->>CT: Reportar incidencia
+        CT->>CT: Registrar caso en aplicación de incidencias
+        CT-->>IM: Informar seguimiento
+        CT-->>CO: Solicitar gestión cuando aplica
+        CT->>CN: Enviar caso para registro aplicable
+        CT->>RC: Comunicar resolución
+    else Sin diferencia
+        RC->>RC: Registrar recepción
+    end
+    end
+
+    rect rgb(255, 241, 244)
+    Note over CO,PG: Solicitud y gestión de pago
+    CO->>PG: Entregar solicitud y soportes
+    IM-->>PG: Entregar solicitud cuando aplica
+    PG->>PG: Preparar y revisar solicitud
+    alt Solicitud requiere corrección
+        PG->>PG: Revisar dentro de su circuito
+        opt Falta información de origen
+            PG->>CO: Consultar a Compras cuando aplica
+            PG->>IM: Consultar a Importaciones cuando aplica
+        end
+    else Solicitud conforme
+        PG->>CN: Entregar soporte para registro
+        CN->>CN: Registrar y relacionar seguimiento
+    end
+    end
+
+    rect rgb(241, 245, 249)
+    Note over CN,CO: Revisión de expediente o corte
+    CN->>CN: Revisar partidas y soportes
+    alt Hay diferencias
+        CN->>IM: Solicitar aclaración
+        opt La causa está en Compras
+            IM->>CO: Solicitar aclaración
+            CO-->>IM: Entregar soporte
+        end
+        IM-->>CN: Entregar aclaración
+    else Sin diferencias
+        CN->>CN: Documentar revisión
+    end
+    end
+
+    Note over CO,CN: Los hitos operativos, documentales y financieros pueden cerrarse en momentos distintos.
+
