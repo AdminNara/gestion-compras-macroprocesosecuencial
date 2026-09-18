@@ -4,32 +4,36 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="description" content="Demo conceptual anonimizada de un macroproceso secuencial." />
+    <link rel="icon" type="image/png" href="assets/nara-n-icon.png" />
     <title>Demo de macroproceso secuencial</title>
     <style>
       :root { color-scheme: light; font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
       * { box-sizing: border-box; }
       body { margin: 0; color: #1e293b; background: #f8fafc; }
       main { width: min(100% - 2rem, 1120px); margin: 0 auto; padding: 2.5rem 0 3.5rem; }
-      .eyebrow { margin: 0 0 .75rem; color: #0369a1; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
+      .masthead { display: flex; align-items: center; gap: 1rem; margin-bottom: .85rem; }
+      .brand-logo { display: block; width: min(11rem, 38vw); height: auto; }
+      .eyebrow { margin: 0; color: #0369a1; font-size: .8rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; }
       h1 { margin: 0; color: #0f172a; font-size: clamp(1.85rem, 5vw, 3rem); line-height: 1.1; }
       .lead { max-width: 72ch; margin: 1rem 0 1.5rem; color: #475569; font-size: 1.05rem; line-height: 1.6; }
       .notice { border-left: .3rem solid #0284c7; border-radius: .35rem; padding: 1rem 1.1rem; background: #e0f2fe; color: #0c4a6e; line-height: 1.55; }
       .notice strong { color: #082f49; }
       .diagram { margin-top: 1.5rem; overflow-x: auto; border: 1px solid #dbe3ec; border-radius: .75rem; padding: 1.25rem; background: #fff; box-shadow: 0 10px 30px rgb(15 23 42 / 7%); }
       .diagram .mermaid { min-width: 1000px; }
-      .source { margin: 1.25rem 0 0; text-align: right; }
-      .source a { color: #0369a1; font-weight: 700; }
       footer { margin-top: 2.25rem; color: #64748b; font-size: .9rem; line-height: 1.55; }
-      @media (max-width: 640px) { main { width: min(100% - 1.25rem, 1120px); padding-top: 1.5rem; } .diagram { padding: .75rem; } }
+      @media (max-width: 640px) { main { width: min(100% - 1.25rem, 1120px); padding-top: 1.5rem; } .brand-logo { width: min(10rem, 52vw); } .diagram { padding: .75rem; } }
     </style>
   </head>
   <body>
     <main>
-      <p class="eyebrow">Nara Consultores · Demo pública</p>
+      <header class="masthead">
+        <img class="brand-logo" src="assets/nara-academy-web.png" alt="Nara Academy" />
+        <p class="eyebrow">Demo pública</p>
+      </header>
       <h1>Macroproceso secuencial</h1>
-      <p class="lead">Una representación visual genérica de interacciones entre áreas de Compras, Importaciones, Costeo, Recepción, Pagos y Contabilidad.</p>
+      <p class="lead">Una representación visual de interacciones entre áreas de Compras, Importaciones, Costeo, Recepción, Pagos y Contabilidad.</p>
       <div class="notice" role="note">
-        <strong>Alcance de la demo:</strong> este material es conceptual y anonimizado. No representa procedimientos, reglas, configuraciones, datos, documentos ni decisiones de un cliente.
+        <strong>Alcance:</strong> este diagrama muestra, a nivel macro, el proceso general de compras e importaciones, con énfasis en la secuencia de actividades y las relaciones entre las áreas participantes.
       </div>
       <section class="diagram" aria-label="Diagrama de secuencia Mermaid">
         <pre class="mermaid">
@@ -42,7 +46,7 @@ sequenceDiagram
     participant PG as Pagos
     participant CN as Contabilidad
 
-    Note over CO,CN: Demo conceptual anonimizada. No representa un procedimiento ni reglas vigentes.
+    Note over CO,CN: Diagrama de nivel macro: secuencia general y relaciones entre áreas.
 
     rect rgb(238, 246, 255)
     Note over CO,IM: Inicio y referencia de compra
@@ -134,8 +138,7 @@ sequenceDiagram
     Note over CO,CN: Los hitos operativos, documentales y financieros pueden cerrarse en momentos distintos.
         </pre>
       </section>
-      <p class="source"><a href="macroproceso-secuencial.mmd">Ver fuente Mermaid anonimizada</a></p>
-      <footer>La disponibilidad pública de esta demo no valida ningún proceso operativo.</footer>
+      <footer>Para mayor detalle revisar el documento AS IS</footer>
     </main>
     <script type="module">
       import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs";
