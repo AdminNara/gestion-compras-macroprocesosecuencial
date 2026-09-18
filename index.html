@@ -36,7 +36,7 @@
         <strong>Alcance:</strong> este diagrama muestra, a nivel macro, el proceso general de compras e importaciones, con énfasis en la secuencia de actividades y las relaciones entre las áreas participantes.
       </div>
       <section class="diagram" aria-label="Diagrama de secuencia Mermaid">
-        <pre class="mermaid" id="macroproceso-secuencial"></pre>
+        <div class="mermaid" id="macroproceso-secuencial"></div>
       </section>
       <footer>Para mayor detalle revisar el documento AS IS</footer>
     </main>
@@ -47,9 +47,11 @@
       try {
         const response = await fetch("macroproceso-secuencial.mmd?v=master-20260918");
         if (!response.ok) throw new Error("No se pudo cargar el diagrama maestro.");
-        diagram.textContent = await response.text();
+        const source = await response.text();
         mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: "base", themeVariables: { fontFamily: "Inter, ui-sans-serif, system-ui, sans-serif", primaryColor: "#e0f2fe", primaryBorderColor: "#0284c7", lineColor: "#475569", textColor: "#0f172a" } });
-        await mermaid.run();
+        const { svg, bindFunctions } = await mermaid.render("macroproceso-secuencial-svg", source);
+        diagram.innerHTML = svg;
+        bindFunctions?.(diagram);
       } catch (error) {
         diagram.textContent = "No fue posible mostrar el diagrama maestro.";
         console.error(error);
